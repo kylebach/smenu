@@ -19,13 +19,21 @@
     [self setupMenu];
     [self setupControlScripts];
     [self initializeSpotifyScript];
+    
     [self updateSpotifyStatus];
-    self.timer = [NSTimer timerWithTimeInterval:1.0
+    
+    [[NSDistributedNotificationCenter defaultCenter] addObserver:self 
+                                                        selector:@selector(spotifyDidChangeTrack:) 
+                                                            name:@"com.spotify.client.PlaybackStateChanged" 
+                                                          object:nil];
+    
+    self.timer = [NSTimer timerWithTimeInterval:10.0
                                          target:self
                                        selector:@selector(updateSpotifyStatus)
                                        userInfo:nil
                                         repeats:YES];
     [[NSRunLoop currentRunLoop] addTimer:self.timer forMode:NSRunLoopCommonModes];
+    
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self
                                                            selector:@selector(applicationDidLaunch:)
                                                                name:NSWorkspaceDidLaunchApplicationNotification
@@ -40,6 +48,10 @@
                                                options:NSKeyValueObservingOptionNew
                                                context:NULL];
     }
+}
+
+- (void)spotifyDidChangeTrack:(NSNotification *)notification {
+    [self updateSpotifyStatus];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
@@ -191,6 +203,7 @@
     [self.timer invalidate];
     self.timer = nil;
     [[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver:self];
+    [[NSDistributedNotificationCenter defaultCenter] removeObserver:self];
     if (@available(macOS 10.14, *)) {
         [[NSApplication sharedApplication] removeObserver:self forKeyPath:@"effectiveAppearance"];
     }
