@@ -98,11 +98,11 @@
                              "            set currentArtist to artist of current track\n"
                              "            return currentTrack & \" - \" & currentArtist\n"
                              "        else\n"
-                             "            return \"\"\n"
+                             "            return \"⏸\"\n"
                              "        end if\n"
                              "    end tell\n"
                              "else\n"
-                             "    return \"\"\n"
+                             "    return \"⏹\"\n"
                              "end if";
     self.spotifyScript = [[NSAppleScript alloc] initWithSource:scriptSource];
 }
